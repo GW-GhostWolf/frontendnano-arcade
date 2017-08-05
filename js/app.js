@@ -1,9 +1,9 @@
 const MinX = 0;
 const MaxX = 404;
 const MinY = -24;
-const MaxY = 396;
+const MaxY = 391;
 const MoveX = 101;
-const MoveY = 84;
+const MoveY = 83;
 
 function Random(min, max) {
     return Math.floor((Math.random() * (max + 1 - min)) + min);
@@ -40,6 +40,8 @@ Enemy.prototype.update = function (dt) {
     // detect collision with player
     if (player.y === this.y && Math.abs(player.x - this.x) < 75) {
         player.Reset();
+        level = 1;
+        score = 0;
     }
     //console.log(this.x);
 }; // update
@@ -71,6 +73,8 @@ Player.prototype.handleInput = function (key) {
     } // switch
     if (this.y <= 0) {
         // victory condition
+        score += level;
+        level++;
         this.Reset();
     }
     console.log(this.x, this.y);
@@ -95,5 +99,8 @@ document.addEventListener("keyup", function (e) {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
+var level = 1;
+var score = 0;
+
 var player = new Player(Random(0, 4), Random(4, 5));
 var allEnemies = [new Enemy(Random(1, 3), Random(1, 5)), new Enemy(Random(1, 3), Random(1, 5)), new Enemy(Random(1, 3), Random(1, 5))];
