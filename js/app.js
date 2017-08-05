@@ -40,15 +40,21 @@ Enemy.prototype.update = function (dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
     this.x = this.x + (this.speed * 50 * dt);
-    if (this.x > MaxX + 1.5 * MoveX) { this.x = MinX + -1.5 * MoveX; }
+    if (this.x > MaxX + 1.5 * MoveX) {
+        this.reset();
+    }
     // detect collision with player
     if (player.y === this.y && Math.abs(player.x - this.x) < 75) {
         player.reset();
         game.reset();
     }
-    //console.log(this.x);
 }; // update
 
+Enemy.prototype.reset = function () {
+    this.x = MinX + -1.5 * MoveX;
+    this.y = MinY + RandomInt(1, 3) * MoveY;
+    this.speed = Random(1, 3);
+}; // reset
 // This class requires an update(), render() and a handleInput() method.
 var Player = function (tileX, tileY) {
     Sprite.call(this, "images/char-boy.png", tileX, tileY);
@@ -73,6 +79,9 @@ Player.prototype.handleInput = function (key) {
         case "down":
             this.y = Math.min(MaxY, this.y + MoveY);
             break;
+        case "space":
+            this.changeCharacter();
+            break;
     } // switch
     if (this.y <= 0) {
         // victory condition
@@ -83,12 +92,21 @@ Player.prototype.handleInput = function (key) {
 
 Player.prototype.reset = function () {
     this.y = MinY + 4 * MoveY;
-}
+}; // reset
+
+Player.prototype.changeCharacter = function () {
+    if (this.sprite == "images/char-boy.png") {
+        this.sprite = "images/char-pink-girl.png";
+    } else {
+        this.sprite = "images/char-boy.png";
+    }
+} // change character
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener("keyup", function (e) {
     var allowedKeys = {
+        32: "space",
         37: "left",
         38: "up",
         39: "right",
@@ -96,6 +114,35 @@ document.addEventListener("keyup", function (e) {
     };
     player.handleInput(allowedKeys[e.keyCode]);
 }); // keyup event listener
+
+// This class requires an update(), render() and a handleInput() method.
+var Gem = function (color, tileX, tileY) {
+    switch (color) {
+        case "blue":
+            Sprite.call(this, "images/Gem Blue.png", tileX, tileY);
+            this.value = 5;
+            break;
+        case "orange":
+            Sprite.call(this, "images/Gem Orange.png", tileX, tileY);
+            this.value = 10;
+            break;
+        default:
+            Sprite.call(this, "images/Gem Green.png", tileX, tileY);
+            this.value = 1;
+            break;
+    }
+}; // gem
+
+Gem.prototype = Object.create(Sprite.prototype);
+Gem.prototype.constructor = Gem;
+
+Gem.prototype.update = function (dt) {
+    // detect collision with player
+    if (player.y === this.y && Math.abs(player.x - this.x) < 75) {
+        game.score += this.value;
+        game.gem = undefined;
+    }
+}; // update
 
 var Game = function () {
     this.reset();
@@ -113,9 +160,11 @@ Game.prototype.reset = function () {
 }; // reset
 
 Game.prototype.levelUp = function () {
+    var colors = ["green", "blue", "orange"];
     this.score += this.level;
     this.level++;
-    if (this.level % 3 === 0) {
+    this.gem = new Gem(colors[RandomInt(0, 3)], RandomInt(0, 4), RandomInt(1, 3));
+    if (this.level % 5 === 0) {
         allEnemies.push(new Enemy(RandomInt(1, 3), Random(1, 3)));
     }
 }; // levelUp
