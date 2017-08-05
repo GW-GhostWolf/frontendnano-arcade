@@ -138,11 +138,11 @@ var Engine = (function(global) {
 
         ctx.clearRect(0, 20, 250, 25);
         ctx.font = "18px Sans-Serif"
-        ctx.fillText("Score: " + score, 15, 45);
+        ctx.fillText("Score: " + game.score, 15, 45);
 
         ctx.clearRect(400, 20, 105, 25);
         ctx.font = "18px Sans-Serif"
-        ctx.fillText("Level: " + level, 420, 45);
+        ctx.fillText("Level: " + game.level, 420, 45);
 
         renderEntities();
     }

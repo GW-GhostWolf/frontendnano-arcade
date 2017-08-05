@@ -5,8 +5,12 @@ const MaxY = 391;
 const MoveX = 101;
 const MoveY = 83;
 
-function Random(min, max) {
+function RandomInt(min, max) {
     return Math.floor((Math.random() * (max + 1 - min)) + min);
+};
+
+function Random(min, max) {
+    return (Math.random() * (max + 1 - min)) + min;
 };
 
 // parent sprite class for all game objects
@@ -39,9 +43,8 @@ Enemy.prototype.update = function (dt) {
     if (this.x > MaxX + 1.5 * MoveX) { this.x = MinX + -1.5 * MoveX; }
     // detect collision with player
     if (player.y === this.y && Math.abs(player.x - this.x) < 75) {
-        player.Reset();
-        level = 1;
-        score = 0;
+        player.reset();
+        game.reset();
     }
     //console.log(this.x);
 }; // update
@@ -73,14 +76,12 @@ Player.prototype.handleInput = function (key) {
     } // switch
     if (this.y <= 0) {
         // victory condition
-        score += level;
-        level++;
-        this.Reset();
+        game.levelUp();
+        this.reset();
     }
-    console.log(this.x, this.y);
 }; // handleInput
 
-Player.prototype.Reset = function () {
+Player.prototype.reset = function () {
     this.y = MinY + 4 * MoveY;
 }
 
@@ -96,11 +97,32 @@ document.addEventListener("keyup", function (e) {
     player.handleInput(allowedKeys[e.keyCode]);
 }); // keyup event listener
 
+var Game = function () {
+    this.reset();
+}; // game
+
+Game.prototype.reset = function () {
+    this.level = 1;
+    this.score = 0;
+    allEnemies = [
+        new Enemy(1, Random(1, 3)),
+        new Enemy(2, Random(1, 3)),
+        new Enemy(3, Random(1, 3))
+    ];
+    this.gem = undefined;
+}; // reset
+
+Game.prototype.levelUp = function () {
+    this.score += this.level;
+    this.level++;
+    if (this.level % 3 === 0) {
+        allEnemies.push(new Enemy(RandomInt(1, 3), Random(1, 3)));
+    }
+}; // levelUp
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var level = 1;
-var score = 0;
-
-var player = new Player(Random(0, 4), Random(4, 5));
-var allEnemies = [new Enemy(Random(1, 3), Random(1, 5)), new Enemy(Random(1, 3), Random(1, 5)), new Enemy(Random(1, 3), Random(1, 5))];
+// allEnemies is set during the Game constructor
+var allEnemies;
+var game = new Game();
+var player = new Player(2, 5);
