@@ -1,12 +1,33 @@
+const MinX = 0;
+const MaxX = 404;
+const MinY = -24;
+const MaxY = 396;
+const MoveX = 101;
+const MoveY = 84;
+
+function Random(min, max) {
+    return Math.floor((Math.random() * (max + 1 - min)) + min);
+};
+
+// parent sprite class for all game objects
+var Sprite = function (image, tileX, tileY) {
+    this.sprite = image;
+    this.x = MinX + tileX * MoveX;
+    this.y = MinY + tileY * MoveY;
+} // sprite
+
+Sprite.prototype.render = function () {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+}; // render
+
 // Enemies our player must avoid
-var Enemy = function (startY, speed) {
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = "images/enemy-bug.png";
-    this.x = MinX + -1.5 * MoveX;
-    this.y = MinY + startY * MoveY;
+var Enemy = function (tileY, speed) {
+    Sprite.call(this, "images/enemy-bug.png", -1.5, tileY);
     this.speed = speed;
 }; // enemy
+
+Enemy.prototype = Object.create(Sprite.prototype);
+Enemy.prototype.constructor = Enemy;
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -23,23 +44,15 @@ Enemy.prototype.update = function (dt) {
     //console.log(this.x);
 }; // update
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function () {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}; // render
-
 // This class requires an update(), render() and a handleInput() method.
-var Player = function (startX, startY) {
-    this.sprite = "images/char-boy.png";
-    this.x = MinX + startX * MoveX;
-    this.y = MinY + startY * MoveY;
+var Player = function (tileX, tileY) {
+    Sprite.call(this, "images/char-boy.png", tileX, tileY);
 }; // player
 
-Player.prototype.update = function (dt) { }; // update
+Player.prototype = Object.create(Sprite.prototype);
+Player.prototype.constructor = Player;
 
-Player.prototype.render = function () {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}; // render
+Player.prototype.update = function (dt) { }; // update
 
 Player.prototype.handleInput = function (key) {
     switch (key) {
@@ -79,15 +92,8 @@ document.addEventListener("keyup", function (e) {
     player.handleInput(allowedKeys[e.keyCode]);
 }); // keyup event listener
 
-const MinX = 0;
-const MaxX = 404;
-const MinY = -24;
-const MaxY = 396;
-const MoveX = 101;
-const MoveY = 84;
-
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var player = new Player(2, 4);
-var allEnemies = [new Enemy(1, 2), new Enemy(2, 3), new Enemy(3, 1.5)];
+var player = new Player(Random(0, 4), Random(4, 5));
+var allEnemies = [new Enemy(Random(1, 3), Random(1, 5)), new Enemy(Random(1, 3), Random(1, 5)), new Enemy(Random(1, 3), Random(1, 5))];
