@@ -53,7 +53,7 @@ Enemy.prototype.update = function (dt) {
 Enemy.prototype.reset = function () {
     this.x = MinX + -1.5 * MoveX;
     this.y = MinY + RandomInt(1, 3) * MoveY;
-    this.speed = Random(1, 3);
+    this.speed = Random(1, 3) * (1 + game.level / 25);
 }; // reset
 // This class requires an update(), render() and a handleInput() method.
 var Player = function (tileX, tileY) {
@@ -143,6 +143,14 @@ Gem.prototype.update = function (dt) {
         game.gem = undefined;
     }
 }; // update
+
+Gem.prototype.render = function () {
+    ctx.save();
+    ctx.scale(0.5, 0.5);
+    ctx.translate(this.x + 52, this.y + 115);
+    Sprite.prototype.render.call(this);
+    ctx.restore();
+}; // render
 
 var Game = function () {
     this.reset();
