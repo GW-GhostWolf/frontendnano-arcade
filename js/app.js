@@ -1,3 +1,4 @@
+// constants for converting from tile location to canvas location
 const MinX = 0;
 const MaxX = 404;
 const MinY = -24;
@@ -5,17 +6,21 @@ const MaxY = 391;
 const MoveX = 101;
 const MoveY = 83;
 
+// generate random interger between min and max (inclusive)
 function RandomInt(min, max) {
     return Math.floor((Math.random() * (max + 1 - min)) + min);
 };
 
+// generate random float between min (inclusive) and max (exclusive)
 function Random(min, max) {
     return (Math.random() * (max + 1 - min)) + min;
 };
 
 // parent sprite class for all game objects
 var Sprite = function (image, tileX, tileY) {
+    // set image
     this.sprite = image;
+    // calcuate canvas location based on tiles
     this.x = MinX + tileX * MoveX;
     this.y = MinY + tileY * MoveY;
 } // sprite
@@ -51,8 +56,11 @@ Enemy.prototype.update = function (dt) {
 }; // update
 
 Enemy.prototype.reset = function () {
+    // start off screen to the left
     this.x = MinX + -1.5 * MoveX;
+    // random row
     this.y = MinY + RandomInt(1, 3) * MoveY;
+    // random speed that gets faster as the game level gets higher
     this.speed = Random(1, 3) * (1 + game.level / 25);
 }; // reset
 // This class requires an update(), render() and a handleInput() method.
@@ -91,10 +99,11 @@ Player.prototype.handleInput = function (key) {
 }; // handleInput
 
 Player.prototype.reset = function () {
-    this.y = MinY + 4 * MoveY;
+    this.y = MinY + 5 * MoveY;
 }; // reset
 
 Player.prototype.changeCharacter = function () {
+    // switch back and forth from boy to girl
     if (this.sprite == "images/char-boy.png") {
         this.sprite = "images/char-pink-girl.png";
     } else {
@@ -115,8 +124,9 @@ document.addEventListener("keyup", function (e) {
     player.handleInput(allowedKeys[e.keyCode]);
 }); // keyup event listener
 
-// This class requires an update(), render() and a handleInput() method.
+// This class requires an update() and render() method.
 var Gem = function (color, tileX, tileY) {
+    // set image and value based on color
     switch (color) {
         case "blue":
             Sprite.call(this, "images/Gem Blue.png", tileX, tileY);
@@ -146,7 +156,9 @@ Gem.prototype.update = function (dt) {
 
 Gem.prototype.render = function () {
     ctx.save();
+    // reduce size
     ctx.scale(0.5, 0.5);
+    // correct location for reduced size
     ctx.translate(this.x + 52, this.y + 115);
     Sprite.prototype.render.call(this);
     ctx.restore();
@@ -156,6 +168,8 @@ var Game = function () {
     this.reset();
 }; // game
 
+// reset game to base state, level 1, score 0
+// 1 enemy on each row
 Game.prototype.reset = function () {
     this.level = 1;
     this.score = 0;
@@ -167,11 +181,16 @@ Game.prototype.reset = function () {
     this.gem = undefined;
 }; // reset
 
+// update to next level on player victory
 Game.prototype.levelUp = function () {
     var colors = ["green", "blue", "orange"];
+    // add level completion to score
     this.score += this.level;
+    // change level
     this.level++;
+    // add / move gem
     this.gem = new Gem(colors[RandomInt(0, 3)], RandomInt(0, 4), RandomInt(1, 3));
+    // add new enemy every 5 levels
     if (this.level % 5 === 0) {
         allEnemies.push(new Enemy(RandomInt(1, 3), Random(1, 3)));
     }
@@ -179,7 +198,10 @@ Game.prototype.levelUp = function () {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
+
 // allEnemies is set during the Game constructor
 var allEnemies;
+// create starting enemies, level 1, score 0
 var game = new Game();
+// new player in the middle of the bottom row
 var player = new Player(2, 5);
