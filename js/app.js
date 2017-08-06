@@ -51,6 +51,7 @@ Enemy.prototype.update = function (dt) {
     // detect collision with player
     if (player.y === this.y && Math.abs(player.x - this.x) < 75) {
         player.reset();
+        console.log("Last score: " + game.score);
         game.reset();
     }
 }; // update
